@@ -1,0 +1,450 @@
+openapi: 3.0.3
+info:
+  title: Test API
+  description: A test API for MCP documentation testing
+  version: 1.0.0
+  contact:
+    name: Test Team
+    email: test@example.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.example.com/v1
+    description: Production server
+  - url: https://staging-api.example.com/v1
+    description: Staging server
+
+tags:
+  - name: users
+    description: User management operations
+  - name: posts
+    description: Blog post operations
+
+paths:
+  /users:
+    get:
+      tags:
+        - users
+      summary: List all users
+      description: Retrieve a paginated list of users
+      operationId: listUsers
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of users per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: search
+          in: query
+          description: Search term for filtering users
+          required: false
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 50
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - users
+      summary: Create a new user
+      description: Create a new user account
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+                  message:
+                    type: string
+                    example: User created successfully
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/{id}:
+    get:
+      tags:
+        - users
+      summary: Get user by ID
+      description: Retrieve a specific user by their ID
+      operationId: getUserById
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - users
+      summary: Update user
+      description: Update an existing user
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+    delete:
+      tags:
+        - users
+      summary: Delete user
+      description: Delete a user account
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+            minimum: 1
+      responses:
+        '204':
+          description: User deleted successfully
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /posts:
+    get:
+      tags:
+        - posts
+      summary: List blog posts
+      description: Retrieve a list of blog posts
+      operationId: listPosts
+      parameters:
+        - name: author_id
+          in: query
+          description: Filter posts by author ID
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - name: published
+          in: query
+          description: Filter by published status
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Post'
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - email
+        - name
+        - created_at
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: John Doe
+        avatar_url:
+          type: string
+          format: uri
+          nullable: true
+          example: https://example.com/avatars/user.jpg
+        created_at:
+          type: string
+          format: date-time
+          example: '2024-01-01T00:00:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2024-01-01T00:00:00Z'
+
+    CreateUserRequest:
+      type: object
+      required:
+        - email
+        - name
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: John Doe
+        password:
+          type: string
+          minLength: 8
+          example: secretpassword
+        avatar_url:
+          type: string
+          format: uri
+          nullable: true
+          example: https://example.com/avatars/user.jpg
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: John Doe
+        avatar_url:
+          type: string
+          format: uri
+          nullable: true
+          example: https://example.com/avatars/user.jpg
+
+    Post:
+      type: object
+      required:
+        - id
+        - title
+        - content
+        - author_id
+        - published
+        - created_at
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          example: My First Blog Post
+        content:
+          type: string
+          example: This is the content of my blog post...
+        author_id:
+          type: integer
+          format: int64
+          example: 1
+        published:
+          type: boolean
+          example: true
+        created_at:
+          type: string
+          format: date-time
+          example: '2024-01-01T00:00:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2024-01-01T00:00:00Z'
+
+    Pagination:
+      type: object
+      required:
+        - current_page
+        - total_pages
+        - per_page
+        - total_items
+      properties:
+        current_page:
+          type: integer
+          example: 1
+        total_pages:
+          type: integer
+          example: 10
+        per_page:
+          type: integer
+          example: 20
+        total_items:
+          type: integer
+          example: 200
+        has_next_page:
+          type: boolean
+          example: true
+        has_prev_page:
+          type: boolean
+          example: false
+
+    Error:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          example: "NOT_FOUND"
+        message:
+          type: string
+          example: "The requested resource was not found"
+        timestamp:
+          type: string
+          format: date-time
+          example: '2024-01-01T00:00:00Z'
+
+    ValidationError:
+      type: object
+      required:
+        - error
+        - message
+        - errors
+      properties:
+        error:
+          type: string
+          example: "VALIDATION_ERROR"
+        message:
+          type: string
+          example: "The given data was invalid"
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          example:
+            email: ["The email field is required."]
+            name: ["The name field is required."]
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []

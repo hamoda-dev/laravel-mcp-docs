@@ -1,0 +1,27 @@
+# PHP package/library ignores
+
+# Composer
+vendor/
+composer.lock
+
+# PHPUnit
+.phpunit.result.cache
+.phpunit.cache/
+
+# Static analysis / QA
+.php-cs-fixer.cache
+.php_cs.cache
+.php_cs
+.phpactor/
+
+# Build artifacts
+build/
+
+
+# Editors / OS files
+.idea/
+.vscode/
+.fleet/
+.DS_Store
+Thumbs.db
+
