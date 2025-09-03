@@ -14,7 +14,7 @@ A Laravel package that exposes API documentation via MCP (Model Context Protocol
 - **Secure Authentication**: Token-based authentication with configurable tokens
 - **Comprehensive API**: Multiple methods for exploring API documentation
 - **Mock Response Generation**: Generate example responses based on OpenAPI schemas
-- **Laravel Integration**: Seamless integration with Laravel 10+ and 11+
+- **Laravel Integration**: Seamless integration with Laravel 10+, 11+, and 12+
 - **Full Test Coverage**: Comprehensive Pest test suite included
 
 ## Supported MCP Methods
@@ -324,11 +324,12 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 |----------------|-----------------|
 | 10.x           | 1.x             |
 | 11.x           | 1.x             |
+| 12.x           | 1.x             |
 
 ## Requirements
 
 - PHP ^8.2
-- Laravel ^10.0 \|\| ^11.0
+- Laravel ^10.0 || ^11.0 || ^12.0
 - Symfony Yaml ^6.0 \|\| ^7.0
 
 ## Roadmap
